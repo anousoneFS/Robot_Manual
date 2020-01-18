@@ -2,27 +2,27 @@
 #include <PS2X_lib.h>  //for v1.6
 #include <Servo.h>
 
-int Time = 40;
+int Time = 10;
 int n = Time;
-int Time2 = 50;
+int Time2 = 65;
 int n2 = Time2;
 
-#define SERVO 9
-#define SERVO2 14
+#define SERVO 8
+#define SERVO2 9 
 
 // left wheel
-#define OUT1 2
-#define OUT2 3
-#define ENA 5
+#define OUT1 28
+#define OUT2 30
+#define ENA 2
 
 // right wheel
-#define OUT3 4
-#define OUT4 7
-#define ENB 6
+#define OUT3 32
+#define OUT4 34
+#define ENB 3
 
 #define ACT_OUT1 22
 #define ACT_OUT2 24
-#define ACT_ENA 26
+#define ACT_ENA 4
 
 /******************************************************************
  * set pins connected to PS2 controller:
@@ -68,7 +68,7 @@ void setup() {
   myservo.attach(SERVO, 500, 2500);
   myservo.write(90);
 
-  myservo2.attach(SERVO2, 500, 2500);
+  myservo2.attach(SERVO2);
   myservo2.write(90);
   
   pinMode(OUT1, OUTPUT);
@@ -85,7 +85,7 @@ void setup() {
   analogWrite(ENA, 150);
   analogWrite(ENB, 150);
 
-  analogWrite(ACT_ENA, 180);
+  analogWrite(ACT_ENA, 100);
   
   delay(300);  //added delay to give wireless ps2 module some time to startup, before configuring it
    
@@ -331,7 +331,7 @@ void moveStop() {
   digitalWrite(OUT3, LOW);
   digitalWrite(OUT4, LOW);
 }
-
+//=====================
 void actuatorForward() {
   digitalWrite(ACT_OUT1, HIGH);
   digitalWrite(ACT_OUT2, LOW);
@@ -346,7 +346,7 @@ void actuatorStop() {
   digitalWrite(ACT_OUT1, LOW);
   digitalWrite(ACT_OUT2, LOW);
 }
-
+//=======================
 void servoStop(){
   pos = 1500;
   myservo.writeMicroseconds(pos);
@@ -364,17 +364,15 @@ void servoRelease() {
     myservo.writeMicroseconds(pos);              // if pos < 1300 is backward 
     delay(15);                                   // waits 15ms for the servo to reach the position
 }
-
-//==============================
-
+//====================
 void servoUp(){
-    pos = 1000;
+    pos = 1200;
     myservo2.writeMicroseconds(pos);              // if pos < 1300 is backward 
     delay(15);     
 }
 
 void servoDown(){
-    pos = 2000;
+    pos = 1800;
     myservo2.writeMicroseconds(pos);              // if pos > 1500 is forward
     delay(15);   
 }
