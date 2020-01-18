@@ -65,10 +65,10 @@ void setup() {
   
   Serial.begin(57600);
 
-  myservo.attach(SERVO);
+  myservo.attach(SERVO, 500, 2500);
   myservo.write(90);
 
-  myservo2.attach(SERVO2);
+  myservo2.attach(SERVO2, 500, 2500);
   myservo2.write(90);
   
   pinMode(OUT1, OUTPUT);
@@ -181,10 +181,6 @@ void loop() {
 // to print value, convert to DEC first eg. Serial.println(ps2x.Analog(PSS_LY), DEC);
 
     // default: stop
-    moveStop();
-    actuatorStop();
-    servoStop();
-    servoStop2();
 
     if(ps2x.Button(PSB_START)) {
         Serial.println("START");
@@ -196,31 +192,25 @@ void loop() {
 
     if(ps2x.Button(PSB_PAD_UP)) {
         Serial.println("UP");
-        
-//        analogWrite(ENA, 150);
-//        analogWrite(ENB, 150);
-        
+        analogWrite(ENA, 150);
+        analogWrite(ENB, 150);
         moveForward();
-    }
-    
-    if(ps2x.Button(PSB_PAD_DOWN)) {
+    }else if(ps2x.Button(PSB_PAD_DOWN)) {
         Serial.println("DOWN");
-//        analogWrite(ENA, 150);
-//        analogWrite(ENB, 150);
+        analogWrite(ENA, 150);
+        analogWrite(ENB, 150);
         moveBackward();
-    }
-
-    if(ps2x.Button(PSB_PAD_LEFT)) {
+    }else if(ps2x.Button(PSB_PAD_LEFT)) {
         Serial.println("LEFT");
-
         turnLeft();
-    }
-
-    if(ps2x.Button(PSB_PAD_RIGHT) ) {
+    }else if(ps2x.Button(PSB_PAD_RIGHT) ) {
         Serial.println("RIGHT");
-
         turnRight();
+    }else{
+      moveStop();
     }
+
+//============================
 
     if(ps2x.Button(PSB_SQUARE)) {
         Serial.println("[]");
@@ -233,22 +223,14 @@ void loop() {
     if(ps2x.Button(PSB_TRIANGLE)) {
         Serial.println("/_\\");
         actuatorForward();
-    }
-    
-    if(ps2x.Button(PSB_CROSS)) {
+    }else if(ps2x.Button(PSB_CROSS)) {
         Serial.println("X");
         actuatorBackward();
+    }else{
+        actuatorStop();
     }
 
-    if(ps2x.Button(PSB_L1)) {
-        Serial.println("L1");
-        servoCatch();
-        if(n != -Time){
-          n--;
-        }else{
-          servoStop();
-        }   
-    }
+//===========================
 
     Serial.print("n,n2 = ");
     Serial.print(n);
@@ -257,54 +239,53 @@ void loop() {
     
     if(ps2x.Button(PSB_L2)) {
         Serial.println("L2");
-        servoRelease();
         if(n != Time){
+           servoRelease();
            n++;  
         }else{
           servoStop();
         }
+    }else if(ps2x.Button(PSB_L1)) {
+        Serial.println("L1");
+        if(n != -Time){
+          servoCatch();
+          n--;
+        }else{
+          servoStop();
+        }   
+    }else{
+      servoStop();
     }
 
     if(ps2x.Button(PSB_L3)) {
         Serial.println("L3");
     }
 
+//============================
+
     if(ps2x.Button(PSB_R1)) {
         Serial.println("R1");
-        servoUp();
         if(n2 != -Time2){
+          servoUp();
           n2--;
         }else{
           servoStop2();
         }   
-    }
-
-    if(ps2x.Button(PSB_R2)) {
+    }else if(ps2x.Button(PSB_R2)) {
         Serial.println("R2");
-        servoDown();
         if(n2 != Time2){
+           servoDown();
            n2++;  
         }else{
           servoStop2();
         }
+    }else{
+      servoStop2();
     }
 
     if(ps2x.Button(PSB_R3)) {
         Serial.println("R3");
     }
-
-
-//    if ((ps2x.Analog(PSS_LY) != 127) || (ps2x.Analog(PSS_LX) != 128) || (ps2x.Analog(PSS_RY) != 127) || (ps2x.Analog(PSS_RX) != 128)) {
-//      Serial.print("(");
-//      Serial.print(ps2x.Analog(PSS_LY));
-//      Serial.print(", ");
-//      Serial.print(ps2x.Analog(PSS_LX), DEC);
-//      Serial.print(", ");
-//      Serial.print(ps2x.Analog(PSS_RY), DEC);
-//      Serial.print(", ");
-//      Serial.print(ps2x.Analog(PSS_RX), DEC);
-//      Serial.println(")");
-//    }
 
   delay(15);
 
@@ -384,14 +365,16 @@ void servoRelease() {
     delay(15);                                   // waits 15ms for the servo to reach the position
 }
 
+//==============================
+
 void servoUp(){
-    pos = 900;
+    pos = 1000;
     myservo2.writeMicroseconds(pos);              // if pos < 1300 is backward 
     delay(15);     
 }
 
 void servoDown(){
-    pos = 2100;
+    pos = 2000;
     myservo2.writeMicroseconds(pos);              // if pos > 1500 is forward
     delay(15);   
 }
