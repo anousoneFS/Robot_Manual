@@ -114,23 +114,6 @@ void setup() {
   else if(error == 3)
     Serial.println("Controller refusing to enter Pressures mode, may not support it. ");
   
-//  Serial.print(ps2x.Analog(1), HEX);
-  
-//   type = ps2x.readType(); 
-//   switch(type) {
-//     case 0:
-//       Serial.print("Unknown Controller type found ");
-//       break;
-//     case 1:
-//       Serial.print("DualShock Controller found ");
-//       break;
-//     case 2:
-//       Serial.print("GuitarHero Controller found ");
-//       break;
-//   case 3:
-//       Serial.print("Wireless Sony DualShock Controller found ");
-//       break;
-//    }
   
 }
 
@@ -146,37 +129,7 @@ void loop() {
 
   ps2x.read_gamepad(false, vibrate); //read controller and set large motor to spin at 'vibrate' speed
 
-// Digital Reading
-// ps2x.Button(PSB_BUTTON)
 
-// Anaglog Reading
-// ps2x.Analog(PSAB_BUTTON)
-// convert analog signal to Decimal number when print, eg. Serial.println(ps2x.Analog(PSAB_BUTTON), DEC);
-
-// Using ButtonPressed, NewButtonState, ButonReleased
-
-//    if(ps2x.ButtonPressed(PSB_CIRCLE))               //will be TRUE if button was JUST pressed
-//      Serial.println("Circle just pressed");
-//    if(ps2x.NewButtonState(PSB_CROSS))               //will be TRUE if button was JUST pressed OR released
-//      Serial.println("X just changed");
-//    if(ps2x.ButtonReleased(PSB_SQUARE))              //will be TRUE if button was JUST released
-
-// Buttons reading
-
-// ps2x.Button(PSB_START)       ps2x.Button(PSB_SELECT)
-// ps2x.Button(PSB_PAD_UP)      ps2x.Button(PSB_PAD_LEFT)     ps2x.Button(PSB_PAD_DOWN)     ps2x.Button(PSB_PAD_RIGHT) 
-// ps2x.Button(PSB_TRIANGLE)    ps2x.Button(PSB_SQUARE)       ps2x.Button(PSB_CROSS)        ps2x.Button(PSB_CIRCLE)
-// ps2x.Button(PSB_L1)          ps2x.Button(PSB_L2)           ps2x.Button(PSB_L3)           ps2x.Button(PSB_R1)           ps2x.Button(PSB_R2)         ps2x.Button(PSB_R3)
-
-// Sticcks reading (Analog only)
-// ps2x.Analog(PSS_LY)    Left stick, Y axis
-// ps2x.Analog(PSS_LX)    Left stick, X axis
-// ps2x.Analog(PSS_RY)    Right stick, Y axis
-// ps2x.Analog(PSS_RX)    Right stick, X axis
-
-// to print value, convert to DEC first eg. Serial.println(ps2x.Analog(PSS_LY), DEC);
-
-    // default: stop
 
     if(ps2x.Button(PSB_START)) {
         Serial.println("START");
