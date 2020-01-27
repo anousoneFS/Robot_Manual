@@ -7,23 +7,22 @@ int n = Time;
 int Time2 = 65;
 int n2 = Time2;
 
-#define SERVO 4
-#define SERVO1 5
-#define SERVO2 6 
-
+#define PS2RCVR 30
 // left wheel
-#define OUT1 28
-#define OUT2 30
 #define ENA 2
+#define OUT1 3
+#define OUT2 4
 
 // right wheel
-#define OUT3 34
-#define OUT4 36
-#define ENB 3
+#define ENB 5
+#define OUT3 7
+#define OUT4 6
 
-#define ACT_OUT1 22
-#define ACT_OUT2 24
-#define ACT_ENA 4
+// left && right
+#define EN 8
+#define L 24
+#define R 26
+
 
 /******************************************************************
  * set pins connected to PS2 controller:
@@ -46,10 +45,6 @@ int n2 = Time2;
 #define pressures   false
 #define rumble      false
 
-Servo myservo;  // create servo object to control a servo
-Servo myservo1;
-Servo myservo2;
-
 int pos;// variable to rotate the servo
 int add;
 
@@ -66,34 +61,30 @@ byte vibrate = 0;
 void setup() {
   
   Serial.begin(57600);
-
-  myservo.attach(SERVO, 500, 2500);
-  myservo.write(90);
-
-  myservo1.attach(SERVO1, 500, 2500);
-  myservo1.write(90);
-
-  myservo2.attach(SERVO2);
-  myservo2.write(90);
-  
+  pinMode(PS2RCVR, OUTPUT);
   pinMode(OUT1, OUTPUT);
   pinMode(OUT2, OUTPUT);
   pinMode(OUT3, OUTPUT);
   pinMode(OUT4, OUTPUT);
   pinMode(ENA, OUTPUT);
   pinMode(ENB, OUTPUT);
-  
-  pinMode(ACT_OUT1, OUTPUT);
-  pinMode(ACT_OUT2, OUTPUT);
-  pinMode(ACT_ENA, OUTPUT);
+
+  pinMode(L, OUTPUT);
+  pinMode(R, OUTPUT);
+  pinMode(EN, OUTPUT);
 
   analogWrite(ENA, 150);
   analogWrite(ENB, 150);
+  analogWrite(EN, 200);
 
-  analogWrite(ACT_ENA, 100);
+  digitalWrite(PS2RCVR, LOW);
+
+  delay(100);
+
+  digitalWrite(PS2RCVR, HIGH);
   
-  delay(300);  //added delay to give wireless ps2 module some time to startup, before configuring it
-   
+  delay(5000);  //added delay to give wireless ps2 module some time to startup, before configuring it
+
   //CHANGES for v1.6 HERE!!! **************PAY ATTENTION*************
   
   //setup pins and settings: GamePad(clock, command, attention, data, Pressures?, Rumble?) check for error
@@ -197,13 +188,9 @@ void loop() {
 
     if(ps2x.Button(PSB_PAD_UP)) {
         Serial.println("UP");
-        analogWrite(ENA, 150);
-        analogWrite(ENB, 150);
         moveForward();
     }else if(ps2x.Button(PSB_PAD_DOWN)) {
         Serial.println("DOWN");
-        analogWrite(ENA, 150);
-        analogWrite(ENB, 150);
         moveBackward();
     }else if(ps2x.Button(PSB_PAD_LEFT)) {
         Serial.println("LEFT");
@@ -211,113 +198,39 @@ void loop() {
     }else if(ps2x.Button(PSB_PAD_RIGHT) ) {
         Serial.println("RIGHT");
         turnRight();
+
+    }else if(ps2x.Button(PSB_SQUARE)) {
+        Serial.println("[]");
+        Left();
+    }else if(ps2x.Button(PSB_CIRCLE)) {
+        Serial.println("O");
+        Right();
+        
     }else{
       moveStop();
     }
 
 //============================
-
-    if(ps2x.Button(PSB_SQUARE)) {
-        Serial.println("[]");
-    }
     
-    if(ps2x.Button(PSB_CIRCLE)) {
-        Serial.println("O");
-    }
-
-    if(ps2x.Button(PSB_TRIANGLE)) {
-        Serial.println("/_\\");
-//        actuatorForward();
-servoUp1();
-    }else if(ps2x.Button(PSB_CROSS)) {
-        Serial.println("X");
-//        actuatorBackward();
-servoDown1();
-    }else{
-//        actuatorStop();
-servoStop1();
-    }
-
-//===========================
-
-    Serial.print("n,n2 = ");
-    Serial.print(n);
-    Serial.print(",");
-    Serial.println(n2);
-    
-    if(ps2x.Button(PSB_L2)) {
-        Serial.println("L2");
-        servoRelease();
-        if(n != Time){
-//           servoRelease();
-           n++;  
-        }else{
-//          servoStop();
-        }
-    }else if(ps2x.Button(PSB_L1)) {
-        Serial.println("L1");
-        servoCatch();
-        if(n != -Time){
-//          servoCatch();
-          n--;
-        }else{
-//          servoStop();
-        }   
-    }else{
-      servoStop();
-    }
-
-    if(ps2x.Button(PSB_L3)) {
-        Serial.println("L3");
-    }
-
-//============================
-
-    if(ps2x.Button(PSB_R1)) {
-        Serial.println("R1");
-        servoDown();
-        if(n2 != -Time2){
-//          servoUp();
-          n2--;
-        }else{
-//          servoStop2();
-        }   
-    }else if(ps2x.Button(PSB_R2)) {
-        Serial.println("R2");
-        servoUp();
-        if(n2 != Time2){
-//           servoDown();
-           n2++;  
-        }else{
-//          servoStop2();
-        }
-    }else{
-      servoStop2();
-    }
-
-    if(ps2x.Button(PSB_R3)) {
-        Serial.println("R3");
-    }
-
   delay(15);
 
 }
 
 
 void turnLeft() {
-  digitalWrite(OUT1, HIGH);
-  digitalWrite(OUT2, LOW);
-
-  digitalWrite(OUT3, LOW);
-  digitalWrite(OUT4, HIGH);
-}
-
-void turnRight() {
   digitalWrite(OUT1, LOW);
   digitalWrite(OUT2, HIGH);
 
   digitalWrite(OUT3, HIGH);
   digitalWrite(OUT4, LOW);
+}
+
+void turnRight() {
+  digitalWrite(OUT1, HIGH);
+  digitalWrite(OUT2, LOW);
+
+  digitalWrite(OUT3, LOW);
+  digitalWrite(OUT4, HIGH);
 }
 
 void moveForward() {
@@ -342,75 +255,17 @@ void moveStop() {
   
   digitalWrite(OUT3, LOW);
   digitalWrite(OUT4, LOW);
-}
-//=====================
-//void actuatorForward() {
-//  digitalWrite(ACT_OUT1, HIGH);
-//  digitalWrite(ACT_OUT2, LOW);
-//}
-//
-//void actuatorBackward() {
-//  digitalWrite(ACT_OUT1, LOW);
-//  digitalWrite(ACT_OUT2, HIGH);
-//}
-//
-//void actuatorStop() {
-//  digitalWrite(ACT_OUT1, LOW);
-//  digitalWrite(ACT_OUT2, LOW);
-//}
-//=======================
-void servoStop(){
-  pos = 1500;
-  myservo.writeMicroseconds(pos);
-  delay(15);
+
+  digitalWrite(L, LOW);
+  digitalWrite(R, LOW);
 }
 
-void servoCatch() {
-    pos = 2500;
-    myservo.writeMicroseconds(pos);              // if pos > 1500 is forward
-    delay(15);                                   // waits 15ms for the servo to reach the position
+void Left() {
+  digitalWrite(L, LOW);
+  digitalWrite(R, HIGH);
 }
 
-void servoRelease() {
-    pos = 0;
-    myservo.writeMicroseconds(pos);              // if pos < 1300 is backward 
-    delay(15);                                   // waits 15ms for the servo to reach the position
-}
-//====================
-void servoUp(){
-    pos = 0;
-    myservo2.writeMicroseconds(pos);              // if pos < 1300 is backward 
-    delay(15);     
-}
-
-void servoDown(){
-    pos = 2500;
-    myservo2.writeMicroseconds(pos);              // if pos > 1500 is forward
-    delay(15);   
-}
-
-void servoStop2(){
-  pos = 1500;
-  myservo2.writeMicroseconds(pos);
-  delay(15);
-}
-
-/////////////
-
-void servoUp1(){
-    pos = 100;
-    myservo1.writeMicroseconds(pos);              // if pos < 1300 is backward 
-    delay(15);     
-}
-
-void servoDown1(){
-    pos = 2300;
-    myservo1.writeMicroseconds(pos);              // if pos > 1500 is forward
-    delay(15);   
-}
-
-void servoStop1(){
-  pos = 1500;
-  myservo1.writeMicroseconds(pos);
-  delay(15);
+void Right() {
+  digitalWrite(L, HIGH);
+  digitalWrite(R, LOW);
 }
