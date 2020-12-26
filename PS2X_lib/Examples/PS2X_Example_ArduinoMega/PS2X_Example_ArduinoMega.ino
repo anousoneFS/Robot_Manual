@@ -8,20 +8,16 @@
 */
 int pos;
 
-#define IN1 24
-#define PWM1 6
-#define IN2 28
-#define PWM2 7  
+#define DIR1 2
+#define DIR2 4
+#define PWM1 3
+#define PWM2 5    
 
-#define OUT1 30
-#define OUT2 32
-#define PWM 5
+#define OUT1 6
+#define OUT2 7
+#define PWM 8
 
-#define ARMLEFT 34
-#define ARMRIGHT 36
-#define ARMPWM 4
-
-#define SERVO 3
+#define SERVO 9
 
 Servo myservo; 
 
@@ -36,28 +32,24 @@ void setup()
   myservo.attach(SERVO, 500, 2500);
   myservo.write(90);
   
-  pinMode(IN1, OUTPUT);
-  pinMode(IN2, OUTPUT);
+  pinMode(DIR1, OUTPUT);
+  pinMode(DIR2, OUTPUT);
   pinMode(PWM1, OUTPUT);
   pinMode(PWM2, OUTPUT);
 
   pinMode(OUT1, OUTPUT);
   pinMode(OUT2, OUTPUT);
   pinMode(PWM, OUTPUT);
-
-  pinMode(ARMLEFT, OUTPUT);
-  pinMode(ARMRIGHT, OUTPUT);
-  pinMode(ARMPWM, OUTPUT);
   
-//  analogWrite(PWM, 255);
-//  analogWrite(ARMPWM, 80);
+  analogWrite(PWM1, 255);
+  analogWrite(PWM2, 255);
+  analogWrite(PWM, 255);
   
-  Serial.begin(57600);
+  Serial.begin(115200);
   // CHANGES for v1.6 HERE!!! **************PAY ATTENTION*************
   // setup pins and settings:  GamePad(clock, command, attention, data, Pressures?, Rumble?) check for error
-  
-  error = ps2x.config_gamepad(13,11,10,12, true, true);
-//  delay(3000);
+  error = ps2x.config_gamepad(22,23,24,25, true, true);
+
   if(error == 0)
   {
     Serial.println("Found Controller, configured successful");
@@ -188,106 +180,95 @@ void loop()
       MoveLeft();     
       
     }else if(ps2x.Button(PSB_L2)){
-      Serial.println("L2 pressed");
-      servoCatch();
+        Serial.println("L2 pressed");
+        servoCatch();
     }else if(ps2x.Button(PSB_R2)){
-      Serial.println("R2 pressed");
-      servoRelease();
+        Serial.println("R2 pressed");
+        servoRelease();
         
-    }else if(ps2x.Button(PSB_GREEN)){
-      Serial.println("Triangle just press");
-        ArmUp();
-    }else if(ps2x.Button(PSB_BLUE)){
-      Serial.println("X just press");
-       ArmDown();
     }else{      
       Serial.println("Stop");
       Stop();
       servoStop();
-      ArmStop();
     }
     
-//    // this will set the large motor vibrate speed based on how hard you press the blue (X) button
-//    vibrate = ps2x.Analog(PSAB_BLUE);
-//    
-//    // will be TRUE if any button changes state (on to off, or off to on)
-//    if (ps2x.NewButtonState())
-//    {
-//      if(ps2x.Button(PSB_L3))
-//        Serial.println("L3 pressed");
-//      if(ps2x.Button(PSB_R3))
-//        Serial.println("R3 pressed");
-//      if(ps2x.Button(PSB_GREEN))
-//        Serial.println("Triangle pressed");
-//    }
-//    
-//    // will be TRUE if button was JUST pressed OR released
-//    if(ps2x.NewButtonState(PSB_BLUE))
-//      Serial.println("X just changed");    
-//    
-//    // print stick values if either is TRUE
-//    if(ps2x.Button(PSB_L1) || ps2x.Button(PSB_R1))
-//    {
-//      Serial.print("Stick Values:");
-//      // Left stick, Y axis. Other options: LX, RY, RX  
-//      Serial.print(ps2x.Analog(PSS_LY), DEC);
-//      Serial.print(",");
-//      Serial.print(ps2x.Analog(PSS_LX), DEC); 
-//      Serial.print(",");
-//      Serial.print(ps2x.Analog(PSS_RY), DEC); 
-//      Serial.print(",");
-//      Serial.println(ps2x.Analog(PSS_RX), DEC); 
-//    }
+    // this will set the large motor vibrate speed based on how hard you press the blue (X) button
+    vibrate = ps2x.Analog(PSAB_BLUE);
+    
+    // will be TRUE if any button changes state (on to off, or off to on)
+    if (ps2x.NewButtonState())
+    {
+      if(ps2x.Button(PSB_L3))
+        Serial.println("L3 pressed");
+      if(ps2x.Button(PSB_R3))
+        Serial.println("R3 pressed");
+      if(ps2x.Button(PSB_GREEN))
+        Serial.println("Triangle pressed");
+    }
+    
+    // will be TRUE if button was JUST pressed OR released
+    if(ps2x.NewButtonState(PSB_BLUE))
+      Serial.println("X just changed");    
+    
+    // print stick values if either is TRUE
+    if(ps2x.Button(PSB_L1) || ps2x.Button(PSB_R1))
+    {
+      Serial.print("Stick Values:");
+      // Left stick, Y axis. Other options: LX, RY, RX  
+      Serial.print(ps2x.Analog(PSS_LY), DEC);
+      Serial.print(",");
+      Serial.print(ps2x.Analog(PSS_LX), DEC); 
+      Serial.print(",");
+      Serial.print(ps2x.Analog(PSS_RY), DEC); 
+      Serial.print(",");
+      Serial.println(ps2x.Analog(PSS_RX), DEC); 
+    }
   }
   delay(50);
 }
 
 void MoveForward(){
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, HIGH);
-  
+  digitalWrite(DIR1, false);
+  digitalWrite(DIR2, false);
   analogWrite(PWM1, 255);
   analogWrite(PWM2, 255);
 }
 
 void MoveBackward(){
-  digitalWrite(IN1, HIGH);
-  digitalWrite(IN2, LOW);
-  
+  digitalWrite(DIR1, true);
+  digitalWrite(DIR2, true);
+  analogWrite(PWM1, 255);
+  analogWrite(PWM2, 255);
+}
+
+void TurnLeft(){
+  digitalWrite(DIR1, false);
+  digitalWrite(DIR2, true);
   analogWrite(PWM1, 255);
   analogWrite(PWM2, 255);
 }
 
 void TurnRight(){
-  digitalWrite(IN1, HIGH);
-  digitalWrite(IN2, HIGH);
-  
-  analogWrite(PWM1, 200);
-  analogWrite(PWM2, 200);
-}
-
-void TurnLeft(){
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, LOW);
-  
-  analogWrite(PWM1, 200);
-  analogWrite(PWM2, 200);
+  digitalWrite(DIR1, true);
+  digitalWrite(DIR2, false);
+  analogWrite(PWM1, 255);
+  analogWrite(PWM2, 255);
 }
 
 void Stop(){
-  analogWrite(PWM, 0);
   analogWrite(PWM1, 0);
   analogWrite(PWM2, 0);
+  analogWrite(PWM, 0);
 }
 
-void MoveRight(){
-  digitalWrite(OUT1, LOW);
-  digitalWrite(OUT2, HIGH);
-  analogWrite(PWM, 255);
-}
 void MoveLeft(){
   digitalWrite(OUT1, HIGH);
   digitalWrite(OUT2, LOW);
+  analogWrite(PWM, 255);
+}
+void MoveRight(){
+  digitalWrite(OUT1, LOW);
+  digitalWrite(OUT2, HIGH);
   analogWrite(PWM, 255);
 }
 
@@ -307,22 +288,4 @@ void servoRelease() {
     pos = 0;
     myservo.writeMicroseconds(pos);              // if pos < 1300 is backward 
     delay(15);                                   // waits 15ms for the servo to reach the position
-}
-
-void ArmDown(){
-  digitalWrite(ARMLEFT, LOW);
-  digitalWrite(ARMRIGHT, HIGH);
-  analogWrite(ARMPWM, 220);
-}
-
-void ArmUp(){
-  digitalWrite(ARMLEFT, HIGH);
-  digitalWrite(ARMRIGHT, LOW);
-  analogWrite(ARMPWM, 220);
-  Serial.println("ArmUP()");
-}
-
-void ArmStop(){
-  
-  analogWrite(ARMPWM, 0);
 }

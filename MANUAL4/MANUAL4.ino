@@ -17,8 +17,8 @@ int pos;
 #define OUT2 32
 #define PWM 5
 
-#define ARMLEFT 34
-#define ARMRIGHT 36
+#define OUT3 34
+#define OUT4 36
 #define ARMPWM 4
 
 #define SERVO 3
@@ -45,8 +45,8 @@ void setup()
   pinMode(OUT2, OUTPUT);
   pinMode(PWM, OUTPUT);
 
-  pinMode(ARMLEFT, OUTPUT);
-  pinMode(ARMRIGHT, OUTPUT);
+  pinMode(OUT3, OUTPUT);
+  pinMode(OUT4, OUTPUT);
   pinMode(ARMPWM, OUTPUT);
   
 //  analogWrite(PWM, 255);
@@ -243,52 +243,60 @@ void loop()
 }
 
 void MoveForward(){
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, HIGH);
+  digitalWrite(OUT1, LOW);
+  digitalWrite(OUT2, HIGH);
+  digitalWrite(OUT3, LOW);
+  digitalWrite(OUT4, HIGH);
   
-  analogWrite(PWM1, 255);
-  analogWrite(PWM2, 255);
+  analogWrite(PWM, 255);
+  analogWrite(ARMPWM, 255);
 }
 
 void MoveBackward(){
-  digitalWrite(IN1, HIGH);
-  digitalWrite(IN2, LOW);
+  digitalWrite(OUT1, HIGH);
+  digitalWrite(OUT2, LOW);
+  digitalWrite(OUT3, HIGH);
+  digitalWrite(OUT4, LOW);
   
-  analogWrite(PWM1, 255);
-  analogWrite(PWM2, 255);
+  analogWrite(PWM, 255);
+  analogWrite(ARMPWM, 255);
 }
 
 void TurnRight(){
-  digitalWrite(IN1, HIGH);
-  digitalWrite(IN2, HIGH);
+  digitalWrite(OUT1, LOW);
+  digitalWrite(OUT2, HIGH);
+  digitalWrite(OUT3, HIGH);
+  digitalWrite(OUT4, LOW);
   
-  analogWrite(PWM1, 200);
-  analogWrite(PWM2, 200);
+  analogWrite(PWM, 180);
+  analogWrite(ARMPWM, 180);
 }
 
 void TurnLeft(){
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, LOW);
+  digitalWrite(OUT1, HIGH);
+  digitalWrite(OUT2, LOW);
+  digitalWrite(OUT3, LOW);
+  digitalWrite(OUT4, HIGH);
   
-  analogWrite(PWM1, 200);
-  analogWrite(PWM2, 200);
+  analogWrite(PWM, 180);
+  analogWrite(ARMPWM, 180);
 }
 
 void Stop(){
   analogWrite(PWM, 0);
+  analogWrite(ARMPWM, 0);
+  
   analogWrite(PWM1, 0);
-  analogWrite(PWM2, 0);
 }
 
 void MoveRight(){
-  digitalWrite(OUT1, LOW);
-  digitalWrite(OUT2, HIGH);
-  analogWrite(PWM, 255);
+  digitalWrite(IN2, HIGH);
+  analogWrite(PWM1, 255);
+  
 }
 void MoveLeft(){
-  digitalWrite(OUT1, HIGH);
-  digitalWrite(OUT2, LOW);
-  analogWrite(PWM, 255);
+  digitalWrite(IN2, LOW);
+  analogWrite(PWM1, 255);
 }
 
 void servoStop(){
@@ -310,19 +318,15 @@ void servoRelease() {
 }
 
 void ArmDown(){
-  digitalWrite(ARMLEFT, LOW);
-  digitalWrite(ARMRIGHT, HIGH);
-  analogWrite(ARMPWM, 220);
+ digitalWrite(IN1, HIGH);
+  analogWrite(PWM2, 220); 
 }
 
 void ArmUp(){
-  digitalWrite(ARMLEFT, HIGH);
-  digitalWrite(ARMRIGHT, LOW);
-  analogWrite(ARMPWM, 220);
-  Serial.println("ArmUP()");
+  digitalWrite(IN1, LOW);
+  analogWrite(PWM2, 150);
 }
 
 void ArmStop(){
-  
-  analogWrite(ARMPWM, 0);
+  analogWrite(PWM2, 0);
 }

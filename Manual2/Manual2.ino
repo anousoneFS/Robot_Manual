@@ -6,22 +6,23 @@
   you must always either restart your Arduino after you conect the controller, 
   or call config_gamepad(pins) again after connecting the controller.
 */
+
 int pos;
 
-#define IN1 24
-#define PWM1 6
-#define IN2 28
-#define PWM2 7  
+#define IN1 36
+#define IN2 34
+#define IN3 32
+#define IN4 30  
 
-#define OUT1 30
-#define OUT2 32
-#define PWM 5
+#define OUT1 31
+#define OUT2 33
+#define PWM 38
 
-#define ARMLEFT 34
-#define ARMRIGHT 36
-#define ARMPWM 4
+#define ARMLEFT 6
+#define ARMRIGHT 24
+#define ARMPWM 3
 
-#define SERVO 3
+#define SERVO 7
 
 Servo myservo; 
 
@@ -38,13 +39,12 @@ void setup()
   
   pinMode(IN1, OUTPUT);
   pinMode(IN2, OUTPUT);
-  pinMode(PWM1, OUTPUT);
-  pinMode(PWM2, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
 
   pinMode(OUT1, OUTPUT);
   pinMode(OUT2, OUTPUT);
   pinMode(PWM, OUTPUT);
-
   pinMode(ARMLEFT, OUTPUT);
   pinMode(ARMRIGHT, OUTPUT);
   pinMode(ARMPWM, OUTPUT);
@@ -57,7 +57,9 @@ void setup()
   // setup pins and settings:  GamePad(clock, command, attention, data, Pressures?, Rumble?) check for error
   
   error = ps2x.config_gamepad(13,11,10,12, true, true);
-//  delay(3000);
+//error = ps2x.config_gamepad(7,5,4,6, true, true);
+
+  delay(1000);
   if(error == 0)
   {
     Serial.println("Found Controller, configured successful");
@@ -124,6 +126,7 @@ void loop()
     // will be TRUE as long as button is pressed
     if(ps2x.Button(UP_STRUM))
       Serial.println("Up Strum");
+      
     if(ps2x.Button(DOWN_STRUM))
       Serial.println("DOWN Strum");
     
@@ -246,48 +249,51 @@ void MoveForward(){
   digitalWrite(IN1, LOW);
   digitalWrite(IN2, HIGH);
   
-  analogWrite(PWM1, 255);
-  analogWrite(PWM2, 255);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
 }
 
 void MoveBackward(){
   digitalWrite(IN1, HIGH);
   digitalWrite(IN2, LOW);
   
-  analogWrite(PWM1, 255);
-  analogWrite(PWM2, 255);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
 }
 
 void TurnRight(){
   digitalWrite(IN1, HIGH);
-  digitalWrite(IN2, HIGH);
+  digitalWrite(IN2, LOW);
   
-  analogWrite(PWM1, 200);
-  analogWrite(PWM2, 200);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
 }
 
 void TurnLeft(){
   digitalWrite(IN1, LOW);
-  digitalWrite(IN2, LOW);
+  digitalWrite(IN2, HIGH);
   
-  analogWrite(PWM1, 200);
-  analogWrite(PWM2, 200);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
 }
 
 void Stop(){
   analogWrite(PWM, 0);
-  analogWrite(PWM1, 0);
-  analogWrite(PWM2, 0);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
 }
 
 void MoveRight(){
   digitalWrite(OUT1, LOW);
-  digitalWrite(OUT2, HIGH);
+//  digitalWrite(OUT2, LOW);
   analogWrite(PWM, 255);
 }
 void MoveLeft(){
   digitalWrite(OUT1, HIGH);
-  digitalWrite(OUT2, LOW);
+//  digitalWrite(OUT2, HIGH);
   analogWrite(PWM, 255);
 }
 
@@ -312,17 +318,17 @@ void servoRelease() {
 void ArmDown(){
   digitalWrite(ARMLEFT, LOW);
   digitalWrite(ARMRIGHT, HIGH);
-  analogWrite(ARMPWM, 220);
+//  analogWrite(ARMPWM, 75);
 }
 
 void ArmUp(){
   digitalWrite(ARMLEFT, HIGH);
   digitalWrite(ARMRIGHT, LOW);
-  analogWrite(ARMPWM, 220);
-  Serial.println("ArmUP()");
+//  analogWrite(ARMPWM, 200);
 }
 
 void ArmStop(){
-  
-  analogWrite(ARMPWM, 0);
+  digitalWrite(ARMLEFT, LOW);
+  digitalWrite(ARMRIGHT, LOW);
+//  analogWrite(ARMPWM, 0);
 }
